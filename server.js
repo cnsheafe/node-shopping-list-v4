@@ -91,13 +91,32 @@ app.get('/recipes', (req, res) => {
   res.json(Recipes.get());
 });
 
+app.put('/recipes/:id', jsonParser, function(req, res){
+	const requiredFields = ['name', 'ingredients', 'id'];
+	for (let i=0; i<requiredFields.length; i++){
+		const field = requiredFields[i];
+		if (!(field in req.body)) {
+			const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+		}
+	}
+	if(req.body.id !== req.params.id) {
+		const msg = `Param id: ${req.param.id} does not match`+  
+				`Request id: ${req.body.id}`;
+		console.error(msg);
+		return res.status(400).send(msg);
+	}
+	res.status(200).json(Recipes.update(req.body)); 
+	
+});
 app.post('/recipes', jsonParser, (req, res) => {
-  // ensure `name` and `budget` are in request body
+  // ensure name and budget are in request body
   const requiredFields = ['name', 'ingredients'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`
+      const message = `Missing ${field} in request body`
       console.error(message);
       return res.status(400).send(message);
     }
